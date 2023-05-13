@@ -1,30 +1,27 @@
 function blockSchedule(events) {
   events.sort((a, b) => a.length - b.length);
-  const schedule = [];
+  var allSchedules = [];
+  var schedule = [];
 
   for(let i=0; i<events.length; i++) {
     var event = events[i];
-    // console.log("Event:", event[0]);
     
     for(let q=1; q < event.length; q++) {
       var timeSlot = event[q];
-      // console.log("timeSlot", timeSlot);
       if(!conflicts(schedule, timeSlot)) {
-        let toAdd = [event[0], timeSlot];
 
-        schedule.push(toAdd); 
-        // console.log("Added", [toAdd], "to schedule");
-        // console.log("Current Schedule:", schedule)
+        schedule.push([event[0], timeSlot]);
+        // break;
       }
     }
   }
-  return schedule;
+  schedule.sort((a, b) => a[1] - b[1]);
+  return allSchedules;
 }
 
 function conflicts(events, period){
   for(let i=0; i<events.length; i++) {
     if(events[i][1] == period) {
-      // console.log("Conflict between", events[i],"and", period);
       return true;
     }
   }
