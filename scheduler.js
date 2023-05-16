@@ -1,65 +1,77 @@
-function blockSchedule(events) {
-  events.sort((a, b) => a.length - b.length);
-  var schedule = [];
-
-  for (var i = 0; i < events.length; i++) {
-    var event = events[i];
-
-    for (var q = 1; q < event.length; q++) {
-      var timeSlot = event[q];
-      if (!conflicts(schedule, timeSlot)) {
-
-        schedule.push([event[0], timeSlot]);
-        // break;
-      }
-    }
-  }
-  schedule.sort((a, b) => a[1] - b[1]);
-  return schedule;
-}
-
-
-
-function backtrack(selected, remaining) {
-  if(remaining.length == 0) {
-    return selected;
-  }
-
+function schedule(eventsToSchedule) {
   var allSchedules = [];
-  
-  for (var i = 0; i < remaining.length; i++) {
-    var event = remaining[i];
+  backtrack([], eventsToSchedule, allSchedules, -1);
+  allSchedules.sort((a, b) => b.length - a.length);
+  let maxLength = allSchedules[0].length;
 
-    for (var q = 1; q < event.length; q++) {
-      var timeSlot = event[q];
-      if (!conflicts(selected, timeSlot)) {
-        selected.push([event[0],timeSlot]);
-        remaining = remaining.slice(i+1);
-        allSchedules.push(backtrack(selected,remaining));
+  for(var i = 0; i < allSchedules.length; i++) {
+    if (allSchedules[i].length !== maxLength) {
+      var bestSchedules = allSchedules.slice(0, i);
+      return bestSchedules;
+    }
+  }
+
+
+  function backtrack(selected, remaining) {
+    if (remaining.length == 0) {
+      allSchedules.push(selected);
+      return;
+    }
+  
+    for (var i = 0; i < remaining.length; i++) {
+      var event = remaining[i];
+  
+      if (!conflicts(selected, event)) {
+        var newSelected = selected.concat([event]);
+        var newRemaining = remaining.slice(i+1);
+        backtrack(newSelected, newRemaining);
       }
     }
   }
-    
-  return allSchedules;
-}
 
 
-function conflicts(events, period) {
-  for (let i = 0; i < events.length; i++) {
-    if (events[i][1] == period) {
-      return true;
+  function backtrack(selected, remaining) {
+    if (remaining.length == 0) {
+      allSchedules.push(selected);
+      return;
+    }
+  
+    for (var i = 0; i < remaining.length; i++) {
+      for (var j = i; j < remaining.length; j++) {
+        var events = remaining.slice(i, j + 1);
+        if (!conflicts(selected, events)) {
+          var newSelected = selected.concat(events);
+          var newRemaining = remaining.slice(0, i).concat(remaining.slice(j + 1));
+          backtrack(newSelected, newRemaining);
+        }
+      }
     }
   }
-  return false;
+  //end
+  
+
+  function conflicts(events, event) {
+    for (let i = 0; i < events.length; i++) {
+      if (events[i][1] == event[1] || events[i][0] == event[0]) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
 }
 
-
-const eventsToSchedule = [
-  ["Event A", 1, 2, 5],
-  ["Event B", 2, 4],
-  ["Event C", 5],
-  ["Event D", 3, 4, 7, 9],
+const input = [
+  ["Event A", 1],
+  ["Event A", 2],
+  ["Event A", 3],
+  ["Event B", 4],
+  ["Event B", 5],
+  ["Event C", 6],
+  ["Event D", 7],
+  ["Event D", 8],
+  ["Event D", 9],
+  ["Event D", 10],
 ];
 
-console.log("blockSchedule:\n", blockSchedule(eventsToSchedule));
-console.log("\nbacktrack:\n",backtrack([], eventsToSchedule));
+console.log(schedule(input));
