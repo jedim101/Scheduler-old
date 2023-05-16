@@ -27,28 +27,7 @@ function schedule(eventsToSchedule) {
         backtrack(newSelected, newRemaining);
       }
     }
-  }
-
-
-  function backtrack(selected, remaining) {
-    if (remaining.length == 0) {
-      allSchedules.push(selected);
-      return;
-    }
-  
-    for (var i = 0; i < remaining.length; i++) {
-      for (var j = i; j < remaining.length; j++) {
-        var events = remaining.slice(i, j + 1);
-        if (!conflicts(selected, events)) {
-          var newSelected = selected.concat(events);
-          var newRemaining = remaining.slice(0, i).concat(remaining.slice(j + 1));
-          backtrack(newSelected, newRemaining);
-        }
-      }
-    }
-  }
-  //end
-  
+  }  
 
   function conflicts(events, event) {
     for (let i = 0; i < events.length; i++) {
